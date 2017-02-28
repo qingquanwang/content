@@ -4,6 +4,7 @@
 import os, sys
 from urllib import quote
 import simplejson as json
+import csv
 
 from crawler import WebCrawler
 from soups import BaikeSoup
@@ -16,6 +17,7 @@ MID_FILE_PATTERN = FOLDER_PREFIX + "_{}.html"
 RELATED_URL_PATTERN = 'http://baike.baidu.com/wikiui/api/zhixinmap?lemmaId={}'
 MAX_DOWNLOAD_COUNT = 10
 MAX_RECURSION_DEPTH = 2
+MAX_RETRY = 5
     
 class BaikeWorker(object):
 
@@ -54,16 +56,22 @@ class BaikeWorker(object):
             if isinstance(jsonObj, list) == True:
                 break
             else:
-                print ('reponse error retry url: {}'.format(relatedApi))
+                tried += 1
+                if tried > MAX_RETRY:
+                    print ('tried 5 times but still return error, url: {}'.format(relatedApi))
+                    return
 
         level += 1
         for relatedLemma in jsonObj[0]['data']:
-            if (relatedLemma['title'].encode('utf-8') in self.loadedLemma):
+            if os.path.isfile(LEMMA_PATTERN.format(relatedLemma['title'].encode('utf-8'))):
+            # if (relatedLemma['title'].encode('utf-8') in self.loadedLemma):
                 print('{} already downloaded, will not start download').format(relatedLemma['title'].encode('utf-8'))
             elif level > MAX_RECURSION_DEPTH:
-                print('reach max recursion depth, will not start download')
+                # print('reach max recursion depth, will not start download')
+                pass
             elif self.fetchedCount > MAX_DOWNLOAD_COUNT:
-                print('reach max search count, will not start download')
+                # print('reach max search count, will not start download')
+                pass
             elif relatedLemma['url'] in self.loadedUrls:
                 print('{} already downloaded, will not start download').format(relatedLemma['url'])
             else:
@@ -73,8 +81,25 @@ class BaikeWorker(object):
 def main(url):
     aBaikeWorker = BaikeWorker(url)
 
+def readFolder(directory):
+    for fileName in os.listdir(directory):
+        if fileName.endswith('.csv'):
+            print ('processing {}'.format(fileName))
+            with open(os.path.join(directory, fileName)) as csvFile:
+                spamreader = csv.reader(csvFile)
+                for row in spamreader:
+                    if os.path.isfile(LEMMA_PATTERN.format(row[0])):
+                        print('already downloaded lemma: {}'.format(row[0]))
+                    else:
+                        main(row[1])
+
+
 if __name__ == '__main__':
-    url = sys.argv[1]
+    # url = sys.argv[1]
     # print(url)
     # url = 'http://baike.baidu.com/item/%E8%8B%B9%E6%9E%9C%E8%85%90%E7%83%82%E7%97%85'
-    main(url)
+    # main(url)
+
+    # directory = sys.argv[1]
+    directory = '../../resources/baike/'
+    readFolder(directory)
