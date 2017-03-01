@@ -12,7 +12,8 @@ from common_keys import *
 from my_utils import *
 
 
-SEARCH_QUERY = 'http://www.baidu.com/s?wd={}%20site%3Abaike.baidu.com&pn={}'
+# SEARCH_QUERY = 'http://www.baidu.com/s?wd={}%20site%3Abaike.baidu.com&pn={}'
+SEARCH_QUERY = 'http://www.baidu.com/s?wd=site%3A(baike.baidu.com)%20title%3A%20({}%20(病))&pn={}'
 LEMMAS_EVERY_PAGE = 10
 MAX_LEMMA_COUNT = 9
 FOLDER_PREFIX = '../../../BaiduWorker/'
@@ -89,14 +90,14 @@ def readFolder(directory):
                     if os.path.isfile(LEMMA_PATTERN.format(row[0])):
                         print('already downloaded lemma: {}'.format(row[0]))
                     else:
-                        main(QUERY_PATTERN.format(row[0]))
+                        main(row[0])
 
 def main(keyword):
     aBaiduWorker = BaiduWorker(keyword)
     
 
 if __name__ == '__main__':
-    # keyword = '苹果 病'
+    # keyword = '神秘果'
     # main(keyword)
 
     directory = '../../resources/baike/'
