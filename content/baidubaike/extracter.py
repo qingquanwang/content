@@ -23,11 +23,16 @@ class BaikeExtracter(object):
         soup = BaikeSoup(contents)
         soup.parse_current_page()
         soup.parse_structure()
-        self.json_str = json.dumps(soup.structure, ensure_ascii=False, indent=4, sort_keys=False)
-        self.lemma = soup.lemma
+        if (len(soup.structure) == 0):
+            self.lemma = ''
+        else:
+            self.json_str = json.dumps(soup.structure, ensure_ascii=False, indent=4, sort_keys=False)
+            self.lemma = soup.lemma
 
 def main(contents):
     aBaikeExtracter = BaikeExtracter(contents)
+    if (self.lemma == ''):
+        return
     fileName = aBaikeExtracter.lemma.encode('utf-8')
     fileName = fileName.replace('/', '__')
     save_to_file(LEMMA_RECORD_PATH.format(fileName), aBaikeExtracter.json_str.encode('utf-8'))

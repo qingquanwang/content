@@ -85,6 +85,10 @@ class BaikeSoup(BaseSoup):
         structure[J_NAME] = soup.h1.string
         # 提取每一段摘要
         summary = ''
+        temp = soup.find(attrs={"label-module":'lemmaSummary'})
+        if temp == None:
+            print('page content error, pls check')
+            return
         for para in soup.find(attrs={"label-module":'lemmaSummary'}).find_all('div'):
             summary += getStr(para)
         structure[J_SUMMARY] = summary
