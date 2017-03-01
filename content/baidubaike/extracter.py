@@ -28,7 +28,9 @@ class BaikeExtracter(object):
 
 def main(contents):
     aBaikeExtracter = BaikeExtracter(contents)
-    save_to_file(LEMMA_RECORD_PATH.format(aBaikeExtracter.lemma.encode('utf-8')), aBaikeExtracter.json_str.encode('utf-8'))
+    fileName = aBaikeExtracter.lemma.encode('utf-8')
+    fileName = fileName.replace('/', '__')
+    save_to_file(LEMMA_RECORD_PATH.format(fileName), aBaikeExtracter.json_str.encode('utf-8'))
 
 if __name__ == '__main__':
     directory = '../../../BaiduWorker/'
