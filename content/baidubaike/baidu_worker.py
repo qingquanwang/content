@@ -46,17 +46,18 @@ class BaiduWorker(object):
             self.soup.parse_current_page()
             # 试图寻找交集
             for newLemma in self.soup.lemmas:
-                duplicated = 0
+                # duplicated = 0
                 if md5_unicode(newLemma[LEMMA_NAME]) in self.totalDic:
                     print ('find duplicated lemma: {}, skip saving'.format(newLemma[LEMMA_NAME].encode('utf-8')))
-                    ++duplicated
+                    # ++duplicated
+                    return
                 else:
                     self.save_lemma_page(newLemma)
                     self.totalLemmas.append(newLemma)
                     self.totalDic[md5_unicode(newLemma[LEMMA_NAME])] = True
-                if duplicated == LEMMAS_EVERY_PAGE:
-                    print ('find 10 duplicated items, return to 1st page, stop crawling')
-                    return
+                # if duplicated == LEMMAS_EVERY_PAGE:
+                #     print ('find 10 duplicated items, return to 1st page, stop crawling')
+                #     return
                 if len(self.totalLemmas) > MAX_LEMMA_COUNT:
                     print ('over max lemma count, stop crawling')
                     return
