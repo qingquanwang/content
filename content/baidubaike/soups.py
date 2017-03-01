@@ -70,8 +70,13 @@ class BaikeSoup(BaseSoup):
     def parse_current_page(self):
         self.lemma = self.soup.h1.string
 
-        tag = self.soup.select('div.lemmaWgt-promotion-rightPreciseAd')[0]
-        self.lemmaid = tag['data-lemmaid']
+        tags = self.soup.select('div.lemmaWgt-promotion-rightPreciseAd')
+        if (len(tags) == 0):
+            print('failed to find lemmaid, lemma = {}'.format(self.lemma.encode('utf-8')))
+            self.lemmaid = ID_UNSET
+        else:
+            tag = tags[0]
+            self.lemmaid = tag['data-lemmaid']
 
     def parse_structure(self):
         soup = self.soup

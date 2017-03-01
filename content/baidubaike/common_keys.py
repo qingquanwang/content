@@ -12,3 +12,6 @@ J_NAME = 'name'
 J_SUMMARY = 'summary'
 J_BASIC_INFO = "basic_info"
 J_H2_INFO = 'h2'
+
+
+ID_UNSET = -1

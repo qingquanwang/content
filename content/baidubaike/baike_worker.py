@@ -47,6 +47,8 @@ class BaikeWorker(object):
         if (url != crawler.response.url):
             self.loadedUrls[crawler.response.url] = True
         
+        if (self.soup.lemmaid == ID_UNSET):
+            return
         tried = 0
         while True:
             relatedApi = RELATED_URL_PATTERN.format(self.soup.lemmaid)
