@@ -18,6 +18,7 @@ RELATED_URL_PATTERN = 'http://baike.baidu.com/wikiui/api/zhixinmap?lemmaId={}'
 MAX_DOWNLOAD_COUNT = 10
 MAX_RECURSION_DEPTH = 2
 MAX_RETRY = 5
+BAIKE_404 = 'http://baike.baidu.com/error.html'
     
 class BaikeWorker(object):
 
@@ -37,6 +38,9 @@ class BaikeWorker(object):
         self.fetchedCount += 1
         # print ('{} lemmas collected'.format(self.fetchedCount))
         crawler = WebCrawler(url)
+        if crawler.response.url == BAIKE_404:
+            print ("url: {} returns 404".format(url))
+            return
         self.soup = BaikeSoup(crawler.source)
         self.soup.parse_current_page()
         lemmaName = self.soup.lemma.encode('utf-8')
@@ -62,12 +66,13 @@ class BaikeWorker(object):
                 if tried > MAX_RETRY:
                     print ('tried 5 times but still return error, url: {}'.format(relatedApi))
                     return
-
+                    
         level += 1
         for relatedLemma in jsonObj[0]['data']:
             if os.path.isfile(LEMMA_PATTERN.format(relatedLemma['title'].encode('utf-8'))):
+                pass
             # if (relatedLemma['title'].encode('utf-8') in self.loadedLemma):
-                print('{} already downloaded, will not start download').format(relatedLemma['title'].encode('utf-8'))
+                # print('{} already downloaded, will not start download').format(relatedLemma['title'].encode('utf-8'))
             elif level > MAX_RECURSION_DEPTH:
                 # print('reach max recursion depth, will not start download')
                 pass
@@ -75,7 +80,8 @@ class BaikeWorker(object):
                 # print('reach max search count, will not start download')
                 pass
             elif relatedLemma['url'] in self.loadedUrls:
-                print('{} already downloaded, will not start download').format(relatedLemma['url'])
+                # print('{} already downloaded, will not start download').format(relatedLemma['url'])
+                pass
             else:
                 self.proceed(relatedLemma['url'], level)
         # self.crawler.save_source_to_file(MID_FILE_PATTERN.format(self.soup.lemmaid))
