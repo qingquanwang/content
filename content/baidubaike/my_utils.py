@@ -6,7 +6,6 @@ import re
 
 
 def save_to_file(fileName, fileContents):
-    fileName = fileName.replace('/', '__')
     with open(fileName, 'w') as f:
         f.write(fileContents)
     print ('file saved to {}'.format(fileName))

@@ -70,7 +70,9 @@ class BaiduWorker(object):
     def save_lemma_page(self, lemma):
         # print (lemma[LEMMA_URL])
         self.crawler = WebCrawler(lemma[LEMMA_URL])
-        self.crawler.save_source_to_file(LEMMA_PATTERN.format(lemma[LEMMA_NAME].encode('utf-8')))
+        lemmaName = lemma[LEMMA_NAME].encode('utf-8')
+        lemmaName = lemmaName.replace('/', '__')
+        self.crawler.save_source_to_file(LEMMA_PATTERN.format(lemmaName))
 
     def save_lemma_info(self):
         json_str = json.dumps(self.totalLemmas, ensure_ascii=False, indent=4, sort_keys=True)
