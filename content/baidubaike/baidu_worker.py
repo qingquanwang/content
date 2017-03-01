@@ -4,6 +4,7 @@
 import os
 from urllib import quote
 import simplejson as json
+import csv
 
 from crawler import WebCrawler
 from soups import BaiduSoup
@@ -13,11 +14,12 @@ from my_utils import *
 
 SEARCH_QUERY = 'http://www.baidu.com/s?wd={}%20site%3Abaike.baidu.com&pn={}'
 LEMMAS_EVERY_PAGE = 10
-MAX_LEMMA_COUNT = 30
-FOLDER_PREFIX = 'BaiduWorker/'
+MAX_LEMMA_COUNT = 9
+FOLDER_PREFIX = '../../../BaiduWorker/'
 BAIDU_RESULT_FOLDER = FOLDER_PREFIX + '_{}.html'
 LEMMA_RECORD_PATH = FOLDER_PREFIX + '_lemmas.json'
 LEMMA_PATTERN = FOLDER_PREFIX + "{}.html"
+QUERY_PATTERN = '{} 病'
 
 class BaiduWorker(object):
 
@@ -38,7 +40,7 @@ class BaiduWorker(object):
     def proceed(self):
         while True:
             self.crawler = WebCrawler(self.get_url())
-            self.crawler.save_source_to_file(BAIDU_RESULT_FOLDER.format(self.fetchedCount))
+            # self.crawler.save_source_to_file(BAIDU_RESULT_FOLDER.format(self.fetchedCount))
             self.soup = BaiduSoup(self.crawler.source)
             self.soup.parse_current_page()
             # 试图寻找交集
@@ -74,10 +76,25 @@ class BaiduWorker(object):
         print ('fetch baidu search url: {}'.format(url))
         return url
 
+def readFolder(directory):
+    for fileName in os.listdir(directory):
+        if fileName.endswith('.csv'):
+            print ('processing {}'.format(fileName))
+            with open(os.path.join(directory, fileName)) as csvFile:
+                spamreader = csv.reader(csvFile)
+                for row in spamreader:
+                    if os.path.isfile(LEMMA_PATTERN.format(row[0])):
+                        print('already downloaded lemma: {}'.format(row[0]))
+                    else:
+                        main(QUERY_PATTERN.format(row[0]))
+
 def main(keyword):
     aBaiduWorker = BaiduWorker(keyword)
     
 
 if __name__ == '__main__':
-    keyword = '苹果 病'
-    main(keyword)
+    # keyword = '苹果 病'
+    # main(keyword)
+
+    directory = '../../resources/baike/'
+    readFolder(directory)
