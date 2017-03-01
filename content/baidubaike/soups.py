@@ -113,7 +113,7 @@ class BaikeSoup(BaseSoup):
         contents = ''
         while True:
             nextTag = nextTag.find_next_sibling('div')
-            if nextTag.get('label-module') == None or nextTag.get('label-module') != 'para':
+            if nextTag == None or nextTag.get('label-module') == None or nextTag.get('label-module') != 'para':
                 break
             contents += getStr(nextTag)
         dic[title] = contents
