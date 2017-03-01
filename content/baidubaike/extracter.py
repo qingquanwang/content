@@ -31,7 +31,7 @@ def main(contents):
     save_to_file(LEMMA_RECORD_PATH.format(aBaikeExtracter.lemma.encode('utf-8')), aBaikeExtracter.json_str.encode('utf-8'))
 
 if __name__ == '__main__':
-    directory = '../../../BaiKeWorker/'
+    directory = '../../../BaiduWorker/'
     for fileName in os.listdir(directory):
         if fileName.endswith('.html'):
             print ('processing {}'.format(fileName))
