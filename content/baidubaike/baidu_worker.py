@@ -59,6 +59,9 @@ class BaiduWorker(object):
                 if len(self.totalLemmas) > MAX_LEMMA_COUNT:
                     print ('over max lemma count, stop crawling')
                     return
+            if (len(self.soup.lemmas) < LEMMAS_EVERY_PAGE):
+                print('search results less than 10, stop searching')
+                return
 
             self.fetchedCount += LEMMAS_EVERY_PAGE
 
