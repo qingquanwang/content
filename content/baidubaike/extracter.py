@@ -31,7 +31,7 @@ class BaikeExtracter(object):
 
 def main(contents):
     aBaikeExtracter = BaikeExtracter(contents)
-    if (self.lemma == ''):
+    if (aBaikeExtracter.lemma == ''):
         return
     fileName = aBaikeExtracter.lemma.encode('utf-8')
     fileName = fileName.replace('/', '__')
