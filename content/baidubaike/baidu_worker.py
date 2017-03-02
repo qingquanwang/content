@@ -100,8 +100,5 @@ def main(keyword):
     
 
 if __name__ == '__main__':
-    # keyword = '神秘果'
-    # main(keyword)
-
     directory = '../../resources/baike/'
     readFolder(directory)
