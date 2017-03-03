@@ -13,7 +13,7 @@ from baidubaike.soups import *
 import os
 
 SEARCH_QUERY = 'https://zhidao.baidu.com/search?lm=0&rn=10&fr=search&word=title: ({})&pn={}'
-FOLDER_PREFIX = '../../BaiduWorker/'
+FOLDER_PREFIX = '../../ZhidaoWorker/'
 ZHIDAO_RESULT_FOLDER = FOLDER_PREFIX + '{}.html'
 ZHIDAO_SEARCH_RESULT_FOLDER = FOLDER_PREFIX + '_{}_{}.html'
 
@@ -32,7 +32,7 @@ class ZhidaoSearchSoup(BaseSoup):
         for hit in self.soup.find_all('dl', class_='dl'):
             if hit.find('a'):
                 url = hit.find('a')['href']
-                url = url.split(".html", 1)[0]
+                url = url.split("?", 1)[0]
                 self.hits.append(url)
 
     def save_result(self):
@@ -53,18 +53,22 @@ class ZhidaoSoup(BaseSoup):
         self.u_best_answer = ''
         self.u_answers = []
         self.u_qid = qid
+        self.u_title = ''
 
     def save_result(self):
         json_obj = {
             "best_answer": self.u_best_answer,
             "answers": self.u_answers,
-            "qid": self.u_qid
+            "qid": self.u_qid,
+            "title": self.u_title
         }
         json_str = json.dumps(json_obj, ensure_ascii=False, indent=4, sort_keys=True)
         # save_to_file(LEMMA_RECORD_PATH, json_str.encode('utf-8'))
         print (json_str)
 
     def parse_current_page(self):
+        if self.soup.find('span', class_='ask-title'):
+            self.u_title = self.soup.find('span', class_='ask-title').get_text()
         answer_divs = self.soup.select('div.bd.answer')
         for div in answer_divs:
             if div.parent and div.parent.get('id') and 'best-answer' in div.parent['id']:
@@ -75,19 +79,29 @@ class ZhidaoSoup(BaseSoup):
                 self.u_answers.append(self.parse_answer_div(div))
 
     def parse_answer_div(self, div):
+        like_count = '-1'
+        tag = div.find('div', class_='qb-zan-eva').find('span')
+        if tag:
+            like_count = tag['data-evaluate']
+
         child = div.find('div', class_='line content')
+        result = {}
         if child:
             # 百度可能将答案中的文字替换成图片
             # 尝试清除可能的img标签
             for img in child.find_all('img'):
                 img.decompose()
-        return ''.join([text for text in child.stripped_strings])
+            result = {
+                "text": ''.join([text for text in child.stripped_strings]),
+                "likes": like_count
+            }
+        return result
 
 
 def crawl_single_page(url):
     aWebCrawler = WebCrawler(url)
-    qid = url.split('/')[-1]
-    aWebCrawler.save_source_to_file(ZHIDAO_RESULT_FOLDER.format(qid + '.html'))
+    qid = url.split('/')[-1].split('.')[0]
+    aWebCrawler.save_source_to_file(ZHIDAO_RESULT_FOLDER.format(qid))
     soup = ZhidaoSoup(aWebCrawler.source, qid)
     soup.parse_current_page()
     soup.save_result()        
@@ -102,7 +116,8 @@ def crawl_zhidao_search(keyword, pn = 0):
     soup.save_result()   
 
     for hit in soup.hits:
-        crawl_single_page(hit)
+        if 'zhidao.baidu.com' in hit:
+            crawl_single_page(hit)
     
 
 if __name__ == '__main__':
@@ -111,11 +126,11 @@ if __name__ == '__main__':
         os.makedirs(FOLDER_PREFIX)
 
     # 含有最佳答案、其它答案的页面
-    url = 'https://zhidao.baidu.com/question/2117472157078581147.html'
+    url = 'https://zhidao.baidu.com/question/68706526.html'
     # 没有最佳答案的页面
     # url = 'https://zhidao.baidu.com/question/1961221172472924660.html'
     # crawl_single_page(url)
 
-    keyword = '苹果'
+    keyword = '苹果树炭疽病'
     pn = 0
     crawl_zhidao_search(keyword, pn)
