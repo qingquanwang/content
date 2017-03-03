@@ -12,10 +12,20 @@ from common_keys import *
 
 SOUP_PARSER = 'lxml'
 
-def getStr(tag):
+def getStr(tag, is_bold = False):
     result = u''
-    for string in tag.stripped_strings:
-        result += string
+    if is_bold and tag.find('b'):
+        temp = unicode(tag).encode('utf-8')
+        temp = temp.replace('<b>', 'b__b__b').replace('</b>', 'p__p__p')
+        # print ('before: {}'.format(temp))
+        soup = BeautifulSoup(temp, SOUP_PARSER)
+        temp = getStr(soup).encode('utf-8')
+        temp = temp.replace('b__b__b', '<b>').replace('p__p__p', '</b>')
+        # print('after: {}'.format(temp))
+        result = temp.decode('utf-8')
+    else:
+        for string in tag.stripped_strings:
+            result += string
     return result
 
 class BaseSoup(object):
@@ -59,12 +69,13 @@ class BaiduSoup(BaseSoup):
 
 class BaikeSoup(BaseSoup):
 
-    def __init__(self, contents):
+    def __init__(self, contents, is_bold = False):
         super(BaikeSoup, self).__init__(contents)
 
         self.lemma = None
         self.lemmaid = None
         self.structure = {}
+        self.is_bold = is_bold
 
     
     def parse_current_page(self):
@@ -90,7 +101,7 @@ class BaikeSoup(BaseSoup):
             print('page content error, pls check')
             return
         for para in soup.find(attrs={"label-module":'lemmaSummary'}).find_all('div'):
-            summary += getStr(para)
+            summary += getStr(para, self.is_bold)
         structure[J_SUMMARY] = summary
         # 提取基本信息
         basicInfo = {}
@@ -119,7 +130,7 @@ class BaikeSoup(BaseSoup):
             nextTag = nextTag.find_next_sibling('div')
             if nextTag == None or nextTag.get('label-module') == None or nextTag.get('label-module') != 'para':
                 break
-            contents += getStr(nextTag)
+            contents += getStr(nextTag, self.is_bold)
         dic[title] = contents
 
 def test_baidu_soup(contents):
