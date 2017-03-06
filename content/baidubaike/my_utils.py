@@ -6,6 +6,9 @@ import os
 
 
 def save_to_file(fileName, fileContents):
+    filePath = os.path.dirname(fileName)
+    if not os.path.exists(filePath):
+        os.makedirs(filePath)
     with open(fileName, 'w') as f:
         f.write(fileContents)
     print ('file saved to {}'.format(fileName))
@@ -32,8 +35,8 @@ def mkdir_recursive(*paths):
 def init_paths(root):
     if not root.endswith('/'):
         root += '/'
-    raw_search_path = root + 'raw/search-diseases/'
-    raw_question_path = root + 'raw/zhidao-diseases/'
+    raw_search_path = root + 'raw/baidu/search-diseases/'
+    raw_question_path = root + 'raw/baidu/zhidao-diseases/'
     json_path = root + 'json/baidu/zhidao-diseases/'
     mkdir_recursive(root, raw_search_path, raw_question_path, json_path)
     raw_search_file = raw_search_path + '_{}_{}.html'
