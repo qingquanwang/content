@@ -10,12 +10,14 @@
 
 from baidubaike.crawler import WebCrawler
 from baidubaike.soups import *
-import os
+import argparse
 
 SEARCH_QUERY = 'https://zhidao.baidu.com/search?lm=0&rn=10&fr=search&word=title: ({})&pn={}'
 FOLDER_PREFIX = '../../ZhidaoWorker/'
 ZHIDAO_RESULT_FOLDER = FOLDER_PREFIX + '{}.html'
 ZHIDAO_SEARCH_RESULT_FOLDER = FOLDER_PREFIX + '_{}_{}.html'
+JSON_PATH = ''
+
 
 class ZhidaoSearchSoup(BaseSoup):
 
@@ -41,8 +43,8 @@ class ZhidaoSearchSoup(BaseSoup):
             "hits": self.hits
         }
         json_str = json.dumps(json_obj, ensure_ascii=False, indent=4, sort_keys=True)
-        # save_to_file(LEMMA_RECORD_PATH, json_str.encode('utf-8'))
         print (json_str)
+        # save_to_file(JSON_PATH, json_str.encode('utf-8'))
 
 
 class ZhidaoSoup(BaseSoup):
@@ -63,8 +65,8 @@ class ZhidaoSoup(BaseSoup):
             "title": self.u_title
         }
         json_str = json.dumps(json_obj, ensure_ascii=False, indent=4, sort_keys=True)
-        # save_to_file(LEMMA_RECORD_PATH, json_str.encode('utf-8'))
-        print (json_str)
+        # print (json_str)
+        save_to_file(JSON_PATH.format(self.u_qid), json_str.encode('utf-8'))
 
     def parse_current_page(self):
         if self.soup.find('span', class_='ask-title'):
@@ -104,33 +106,43 @@ def crawl_single_page(url):
     aWebCrawler.save_source_to_file(ZHIDAO_RESULT_FOLDER.format(qid))
     soup = ZhidaoSoup(aWebCrawler.source, qid)
     soup.parse_current_page()
-    soup.save_result()        
+    soup.save_result()
 
-def crawl_zhidao_search(keyword, pn = 0):
+
+def crawl_zhidao_search(keyword, pn=0):
     url = SEARCH_QUERY.format(keyword, pn)
     print ('process url: {}'.format(url))
     aWebCrawler = WebCrawler(url)
     aWebCrawler.save_source_to_file(ZHIDAO_SEARCH_RESULT_FOLDER.format(keyword, pn))
     soup = ZhidaoSearchSoup(aWebCrawler.source)
     soup.parse_current_page()
-    soup.save_result()   
+    soup.save_result()
 
     for hit in soup.hits:
         if 'zhidao.baidu.com' in hit:
             crawl_single_page(hit)
-    
+
 
 if __name__ == '__main__':
 
-    if not os.path.exists(FOLDER_PREFIX):
-        os.makedirs(FOLDER_PREFIX)
-
-    # 含有最佳答案、其它答案的页面
-    url = 'https://zhidao.baidu.com/question/68706526.html'
-    # 没有最佳答案的页面
-    # url = 'https://zhidao.baidu.com/question/1961221172472924660.html'
-    # crawl_single_page(url)
-
-    keyword = '苹果树炭疽病'
-    pn = 0
-    crawl_zhidao_search(keyword, pn)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-path', help='指定下载的.html和.json文件的下载根目录，默认是../../data/')
+    parser.add_argument('-keyword', help='指定搜索的关键词，例如：苹果树炭疽病')
+    parser.add_argument('-url', help='指定百度知道页的url，例如http://zhidao.baidu.com/question/68706526.html')
+    args = parser.parse_args()
+    # print(args)
+    if args.path:
+        FOLDER_PREFIX = args.path
+    ZHIDAO_SEARCH_RESULT_FOLDER, ZHIDAO_RESULT_FOLDER, JSON_PATH = init_paths(FOLDER_PREFIX)
+    if args.keyword:
+        keyword = '苹果树炭疽病'
+        pn = 0
+        crawl_zhidao_search(args.keyword, pn)
+    elif args.url:
+        # 含有最佳答案、其它答案的页面
+        # url = 'http://zhidao.baidu.com/question/68706526.html'
+        # 没有最佳答案的页面
+        # url = 'http://zhidao.baidu.com/question/1961221172472924660.html'
+        crawl_single_page(args.url)
+    else:
+        print('没有输入有效的参数')
