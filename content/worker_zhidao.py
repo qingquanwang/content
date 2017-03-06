@@ -135,7 +135,6 @@ if __name__ == '__main__':
         FOLDER_PREFIX = args.path
     ZHIDAO_SEARCH_RESULT_FOLDER, ZHIDAO_RESULT_FOLDER, JSON_PATH = init_paths(FOLDER_PREFIX)
     if args.keyword:
-        keyword = '苹果树炭疽病'
         pn = 0
         crawl_zhidao_search(args.keyword, pn)
     elif args.url:
