@@ -11,7 +11,11 @@ def save_to_file(fileName, fileContents):
         os.makedirs(filePath)
     with open(fileName, 'w') as f:
         f.write(fileContents)
-    print ('file saved to {}'.format(fileName))
+    # 兼容旧代码，以后需要删除
+    if isinstance(fileName, str):
+        print ('file saved to {}'.format(fileName))
+    else:
+        print (u'file saved to {}'.format(fileName))
 
 
 def md5_unicode(string):
