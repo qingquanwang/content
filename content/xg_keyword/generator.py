@@ -9,7 +9,7 @@ from my_utils import *
 
 is_debug = False
 JSON_EXT = u'.json'
-ALIAS_LIST = [u'别称']
+ALIAS_LIST = [u'别称', u'别名']
 plants = []
 diseases = []
 
