@@ -6,38 +6,13 @@ import simplejson as json
 
 from common_keys import *
 from my_utils import *
+import utilities
+from utilities import ll, lw, le, lj
 
-is_debug = False
 JSON_EXT = u'.json'
 ALIAS_LIST = [u'别称', u'别名']
 plants = []
 diseases = []
-
-
-def le(error, info):
-    print (u'error: {}, info: {}'.format(error, info))
-
-
-def lw(error, info):
-    print (u'warning: {}, info: {}'.format(error, info))
-
-
-def ll(msg):
-    if not is_debug:
-        return
-    if isinstance(msg, list):
-        print(u'list: [{}]'.format(u','.join(msg)))
-    elif isinstance(msg, str):
-        print(msg)
-    elif isinstance(msg, unicode):
-        print(msg)
-    else:
-        print(u'll未处理的类型: {}'.format(type(msg)))
-
-
-def lj(json_content):
-    json_str = json.dumps(json_content, ensure_ascii=False, indent=4, sort_keys=False)
-    ll(json_str)
 
 
 def extract_folder(directory, ext, handler):
@@ -96,8 +71,7 @@ def plant_keyword(args):
 
 
 def plant_keyword_test(args):
-    global is_debug
-    is_debug = True
+    utilities.is_debug = True
     with open(args[0]) as dataFile:
         parse_plant_json(dataFile)
     save_result(args[1], u'植物名.txt', plants)
@@ -142,8 +116,7 @@ def disease_keyword(args):
 
 
 def disease_keyword_test(args):
-    global is_debug
-    is_debug = True
+    utilities.is_debug = True
     with open(args[0]) as dataFile:
         parse_disease_json(dataFile)
     save_result(args[1], u'病名.txt', diseases)
