@@ -11,6 +11,7 @@ functions = {'plant': xg_keyword.generator.plant_keyword,
              'disease': xg_keyword.generator.disease_keyword,
              'disease_test': xg_keyword.generator.disease_keyword_test,
              'cal_freq': xg_keyword.utilities.cal_freq,
+             'split_lemma': xg_keyword.utilities.split_lemma,
              }
 
 if __name__ == '__main__':
@@ -21,6 +22,7 @@ if __name__ == '__main__':
         病: python main.py disease ../../data/json/baidu/baike-diseases/ ../../output/
         病test: python main.py disease_test ../../data/json/baidu/baike-diseases/枣缩果病.json ../../output/
         计算词频: python main.py cal_freq ../../output/ ../../content/resources/baike/keyords/zhidao_seg.txt
+        分离词条中可能包含的词条: python main.py split_lemma ../../output/病名.txt ../../output/植物名.txt
         ''', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('type', help='指定生成的关键词类型: plant')
     parser.add_argument('in_path', help='指定输入根目录')
